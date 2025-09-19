@@ -35,6 +35,7 @@ public class GlobalExceptionHandle {
                 "Invalid Input!!",error,request.getRequestURI());
         return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(DuplicateUserException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateUserFoundException(DuplicateUserException ex, HttpServletRequest request) {
         String uri=request.getRequestURI();
@@ -43,5 +44,36 @@ public class GlobalExceptionHandle {
                 "Duplicate User Data!!!",ex.getErrors(),uri);
         return new ResponseEntity<>(errorResponse,HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(InvalidLoginException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidLoginCredentialException(InvalidLoginException ex, HttpServletRequest request) {
+        String uri=request.getRequestURI();
+        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Invalid Login credential",ex.getMessage(),uri);
+        return new ResponseEntity<>(errorResponse,HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(UserNotFoundByEmailException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundByEmailException(UserNotFoundByEmailException ex, HttpServletRequest request) {
+        String uri=request.getRequestURI();
+        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "User Not found!!!",ex.getMessage(),uri);
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
 
 }

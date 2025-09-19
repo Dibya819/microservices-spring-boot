@@ -1,12 +1,9 @@
 package com.dibya.programming.service;
 
-import com.dibya.programming.dtos.UpdateRequestDto;
-import com.dibya.programming.dtos.UserRequestDTO;
-import com.dibya.programming.dtos.UserResponseDTO;
+import com.dibya.programming.securityandconfig.JwtUtil;
+import com.dibya.programming.dtos.*;
 import com.dibya.programming.enums.Role;
-import com.dibya.programming.globalexceptionhandling.DuplicateUserException;
-import com.dibya.programming.globalexceptionhandling.EmailAlreadyExistException;
-import com.dibya.programming.globalexceptionhandling.UserNotFoundException;
+import com.dibya.programming.globalexceptionhandling.*;
 import com.dibya.programming.model.User;
 import com.dibya.programming.repository.UserRepository;
 import com.dibya.programming.utils.DtoUtils;
@@ -22,12 +19,14 @@ public class UserServiceImplementation implements UserService{
 
       private final UserRepository userRepository;
       private final BCryptPasswordEncoder passwordEncoder;
+      private final JwtUtil jwtUtil;
 
       @Autowired
-     public UserServiceImplementation(UserRepository userRepository,BCryptPasswordEncoder passwordEncoder){
+     public UserServiceImplementation(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtUtil jwtUtil){
          this.userRepository=userRepository;
          this.passwordEncoder=passwordEncoder;
-     }
+          this.jwtUtil = jwtUtil;
+      }
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
@@ -84,6 +83,22 @@ public class UserServiceImplementation implements UserService{
     public void deleteUser(Long id) {
           User user=userRepository.findById(id).orElseThrow(()->new UserNotFoundException(id));
           userRepository.delete(user);
+    }
+
+    @Override
+    public LoginResponseDTO login(LoginRequestDto requestDTO) {
+        User user=userRepository.findByEmail(requestDTO.getEmail()).orElseThrow(()-> new UserNotFoundByEmailException(requestDTO.getEmail()));
+        if(!passwordEncoder.matches(requestDTO.getPassword(), user.getPassword())){
+            throw  new InvalidLoginException(requestDTO.getEmail());
+        }
+     String token= jwtUtil.generateToken(user);
+        return LoginResponseDTO.builder()
+                .token(token)
+                .id(user.getId())
+                .name(user.getName())
+                .role(user.getRole().name())
+                .email(user.getEmail())
+                .build();
     }
 
 
