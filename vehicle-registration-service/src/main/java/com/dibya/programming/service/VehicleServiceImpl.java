@@ -7,6 +7,10 @@ import com.dibya.programming.globalexceptionhandling.DuplicateVehicleException;
 import com.dibya.programming.globalexceptionhandling.VehicleNotFoundException;
 import com.dibya.programming.model.Vehicles;
 import com.dibya.programming.repository.VehicleRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,6 +70,13 @@ public class VehicleServiceImpl implements VehicleService{
        vehicleRepository.delete(vehicles);
     }
 
+    @Override
+    public VehicleResponseDto getVehicleByRegistrationNumber(String registrationNumber) {
+        Vehicles vehicle = vehicleRepository.findByRegistrationNumber(registrationNumber)
+                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with registration number: " + registrationNumber));
+        return mapToDto(vehicle);
+    }
+
 
     private Vehicles mapToEntity(VehicleRequestDto requestDto,Long ownerId){
         return Vehicles.builder()
@@ -72,6 +84,8 @@ public class VehicleServiceImpl implements VehicleService{
                 .type(requestDto.getType())
                 .model(requestDto.getModel())
                 .color(requestDto.getColor())
+                .email(requestDto.getEmail())
+                .number(requestDto.getPhoneNumber())
                 .ownerId(ownerId)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -85,6 +99,8 @@ public class VehicleServiceImpl implements VehicleService{
                 .ownerId(vehicle.getOwnerId())
                 .model(vehicle.getModel())
                 .color(vehicle.getColor())
+                .email(vehicle.getEmail())
+                .number(vehicle.getNumber())
                 .createdAt(vehicle.getCreatedAt())
                 .updatedAt(vehicle.getUpdatedAt())
                 .build();
@@ -95,10 +111,16 @@ public class VehicleServiceImpl implements VehicleService{
         if (dto.getModel() != null) existingVehicle.setModel(dto.getModel());
         if (dto.getColor() != null) existingVehicle.setColor(dto.getColor());
         if (newOwnerId != null) existingVehicle.setOwnerId(newOwnerId);
+        if (dto.getEmail() != null) existingVehicle.setEmail(dto.getEmail());
+        if (dto.getPhoneNumber() != null) existingVehicle.setNumber(dto.getPhoneNumber());
         existingVehicle.setUpdatedAt(LocalDateTime.now());
     }
 
-    public Long getUserId(String email,String phoneNumber){
+    @CircuitBreaker(name = "userServiceCircuit", fallbackMethod = "getUserIdFallback")
+    @Retry(name = "userServiceRetry", fallbackMethod = "getUserIdFallback")
+    @RateLimiter(name = "userServiceRateLimiter", fallbackMethod = "getUserIdFallback")
+    @TimeLimiter(name = "userServiceTimeLimiter")
+    public CompletableFuture<Long> getUserId(String email,String phoneNumber){
         UriComponentsBuilder uriBuilder = UriComponentsBuilder
                 .fromHttpUrl("http://api-gateway/auth/id");
         if (email != null) uriBuilder.queryParam("email", email);
@@ -108,6 +130,13 @@ public class VehicleServiceImpl implements VehicleService{
                 .uri(uriBuilder.toUriString())
                 .retrieve()
                 .bodyToMono(Long.class)
-                .block();
+                .toFuture();
     }
+    private CompletableFuture<Long> getUserIdFallback(String email, String phoneNumber, Throwable t) {
+        System.out.println("Fallback triggered due to: " + t.getMessage());
+        return CompletableFuture.failedFuture(
+                new RuntimeException("Service temporarily unavailable. Please try again after some time.")
+        );
+    }
+
 }

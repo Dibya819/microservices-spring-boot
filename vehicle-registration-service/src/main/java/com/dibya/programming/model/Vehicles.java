@@ -15,6 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class Vehicles {
+    @Column(unique = true)
+    public String email;
+    @Column(unique = true)
+    public String number;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

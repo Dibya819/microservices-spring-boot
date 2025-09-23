@@ -11,4 +11,6 @@ public interface VehicleService {
     VehicleResponseDto updateVehicle(Long id, UpdateVehicleDTO updateDto, Long newOwnerId);
     List<VehicleResponseDto> getVehiclesByOwner(Long ownerId);
     void deleteVehicleOfUser(Long vehicleId, Long ownerId);
+    VehicleResponseDto getVehicleByRegistrationNumber(String registrationNumber);
+
 }

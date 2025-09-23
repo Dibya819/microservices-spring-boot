@@ -32,7 +32,7 @@ public class VehicleController {
         if (!role.equals("ADMIN")) {
             throw new AccessDeniedException("Only ADMIN can register vehicles");
         }
-        Long ownerId = vehicleServiceImpl.getUserId(requestDto.getEmail(), requestDto.getPhoneNumber());
+        Long ownerId = vehicleServiceImpl.getUserId(requestDto.getEmail(), requestDto.getPhoneNumber()).join();
         if (ownerId == null) {
             throw new RuntimeException("User not found with given email or phone number");
         }
@@ -50,7 +50,7 @@ public class VehicleController {
         }
         Long newOwnerId=null;
         if (updateDto.getEmail() != null || updateDto.getPhoneNumber() != null) {
-            newOwnerId = vehicleServiceImpl.getUserId(updateDto.getEmail(), updateDto.getPhoneNumber());
+            newOwnerId = vehicleServiceImpl.getUserId(updateDto.getEmail(), updateDto.getPhoneNumber()).join();
             if (newOwnerId == null) {
                 throw new RuntimeException("User not found with given email or phone number");
             }
@@ -65,7 +65,7 @@ public class VehicleController {
                                                                 @RequestHeader("X-User-Id") Long currentUserId){
         Long userId;
         if("ADMIN".equals(role) || "TRAFFIC_OFFICER".equals(role)){
-             userId=vehicleServiceImpl.getUserId(email,number);
+             userId=vehicleServiceImpl.getUserId(email,number).join();
             if (userId == null) {
                 throw new RuntimeException("User not found with given email/phone");
             }
@@ -83,11 +83,22 @@ public class VehicleController {
         if(!"ADMIN".equals(role)){
             throw new AccessDeniedException("Only ADMIN can remove vehicles");
         }
-        Long ownerId=vehicleServiceImpl.getUserId(email,number);
+        Long ownerId=vehicleServiceImpl.getUserId(email,number).join();
        if (ownerId == null) {
            throw new RuntimeException("User not found with given email/phone");
        }
        vehicleService.deleteVehicleOfUser(vehicleId,ownerId);
        return new ResponseEntity<>("Deleted Successfully",HttpStatus.OK);
    }
+    @GetMapping("/details/{registrationNumber}")
+    public ResponseEntity<VehicleResponseDto> getVehicleDetails(@PathVariable("registrationNumber") String registrationNumber,
+                                                                @RequestHeader("X-User-Role") String role,
+                                                                @RequestHeader("X-User-Id") Long currentUserId) {
+        VehicleResponseDto vehicleResponse = vehicleServiceImpl.getVehicleByRegistrationNumber(registrationNumber);
+        if ("DRIVER".equals(role) && !vehicleResponse.getOwnerId().equals(currentUserId)) {
+            throw new AccessDeniedException("You are not allowed to view this vehicle");
+        }
+        return new ResponseEntity<>(vehicleResponse, HttpStatus.OK);
+    }
+
 }

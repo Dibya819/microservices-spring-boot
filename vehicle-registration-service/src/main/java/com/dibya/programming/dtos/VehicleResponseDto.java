@@ -18,6 +18,8 @@ public class VehicleResponseDto {
     private Long ownerId;
     private String model;
     private String color;
+    private String email;
+    private String number;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

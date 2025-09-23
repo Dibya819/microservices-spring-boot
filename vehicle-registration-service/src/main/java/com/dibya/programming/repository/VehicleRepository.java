@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicles,Long> {
@@ -16,4 +17,7 @@ public interface VehicleRepository extends JpaRepository<Vehicles,Long> {
             message = "Registration number must be between 6 and 15 characters")
                                        @NotBlank(message = "Registration number is required") String registrationNumber);
     List<Vehicles> findByOwnerId(Long ownerId);
+
+
+    Optional<Vehicles> findByRegistrationNumber(String registrationNumber);
 }
