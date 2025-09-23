@@ -16,7 +16,7 @@ public class ErrorResponse {
     private List<String> messages;
     private String path;
 
-    public ErrorResponse(LocalDateTime timeStamp, int status, String error,List<String> messages, String path) {
+    public ErrorResponse(LocalDateTime timeStamp, int status, String error, List<String> messages, String path) {
         this.timeStamp = timeStamp;
         this.status = status;
         this.error = error;

@@ -20,8 +20,6 @@ public class UserRequestDTO {
     private String email;
     @NotBlank(message = "Password Required!!!")
     private String password;
-    @Pattern(regexp="DRIVER|TRAFFIC_OFFICER|ADMIN", message="Role must be valid")
-    private String role;
     @NotBlank
     @Pattern(regexp = "\\d{10}", message = "Phone number must be exactly 10 digits")
     private String phoneNumber;

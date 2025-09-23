@@ -14,5 +14,20 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
+  mysql-vehicles:
+    image: mysql:8.0
+    container_name: smartcity-mysql-vehicles
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: vehiclepassword
+      MYSQL_DATABASE: smart_city_vehicles
+      MYSQL_USER: vehicleuser
+      MYSQL_PASSWORD: vehiclepassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-vehicles-data:/var/lib/mysql
+
 volumes:
   mysql-data:
+  mysql-vehicles-data:

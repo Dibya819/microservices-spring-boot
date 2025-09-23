@@ -12,6 +12,7 @@
         <module>user-service-microservice</module>
         <module>eureka-server</module>
         <module>api-gateway</module>
+        <module>vehicle-registration-service</module>
     </modules>
 
 

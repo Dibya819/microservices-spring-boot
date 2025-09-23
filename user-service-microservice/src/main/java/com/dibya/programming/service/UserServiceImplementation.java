@@ -98,6 +98,7 @@ public class UserServiceImplementation implements UserService{
                 .name(user.getName())
                 .role(user.getRole().name())
                 .email(user.getEmail())
+                .number(user.getPhoneNumber())
                 .build();
     }
 
@@ -114,11 +115,11 @@ public class UserServiceImplementation implements UserService{
     }
 
     private User mapToEntity(UserRequestDTO userRequestDTO){
-        Role role=Role.valueOf(userRequestDTO.getRole());
+
           return User.builder()
                   .name(userRequestDTO.getName())
                   .email(userRequestDTO.getEmail())
-                  .role(role)
+                  .role(Role.DRIVER)
                   .state(userRequestDTO.getState())
                   .address(userRequestDTO.getAddress())
                   .phoneNumber(userRequestDTO.getPhoneNumber())

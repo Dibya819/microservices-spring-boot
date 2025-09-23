@@ -19,6 +19,7 @@ public class SecurityConfig {
             .authorizeExchange(exchanges -> exchanges
                 .pathMatchers("/auth/**").permitAll()
                     .pathMatchers("/users/**").authenticated()
+                    .pathMatchers("/vehicles/**").authenticated()
                 .anyExchange().authenticated()
             )
             .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)

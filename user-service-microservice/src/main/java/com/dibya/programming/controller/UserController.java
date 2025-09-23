@@ -26,8 +26,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO>findUserById(@PathVariable("id") Long id, @RequestHeader("X-User-Id") Long userId,
                                                        @RequestHeader("X-User-Role") String role){
-        System.out.println("userId from header: " + userId);
-        System.out.println("role from header: " + role);
             if ("DRIVER".equals(role) && !userId.equals(id)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only view your own details");
             }
@@ -45,18 +43,21 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable("id") Long id, @RequestBody @Valid UpdateRequestDto requestDto,
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable("id") Long id,
+                                                      @RequestBody @Valid UpdateRequestDto requestDto,
                                                       @RequestHeader("X-User-Id") Long userId,
                                                       @RequestHeader("X-User-Role") String role){
         if("ADMIN".equals(role)){
 
         }else if("TRAFFIC_OFFICER".equals(role)){
-           if("ADMIN".equals(requestDto.getRole())){
+           if(requestDto.getRole() != null &&"ADMIN".equals(requestDto.getRole())){
                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot assign ADMIN role");
            } 
         } else if ("DRIVER".equals(role)) {
             if(!userId.equals(id)){
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only change your details");
+            } if (requestDto.getRole() != null && !"DRIVER".equals(requestDto.getRole())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Drivers cannot change their role");
             }
         }else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unknown role");
@@ -73,5 +74,6 @@ public class UserController {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
 
 }

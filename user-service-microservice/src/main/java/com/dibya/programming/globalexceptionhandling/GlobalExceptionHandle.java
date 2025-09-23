@@ -61,6 +61,14 @@ public class GlobalExceptionHandle {
                 "User Not found!!!",ex.getMessage(),uri);
         return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(UserNotFoundByPhoneNumberException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundByNumberException(UserNotFoundByPhoneNumberException ex, HttpServletRequest request) {
+        String uri=request.getRequestURI();
+        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "User Not found!!!",ex.getMessage(),uri);
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
