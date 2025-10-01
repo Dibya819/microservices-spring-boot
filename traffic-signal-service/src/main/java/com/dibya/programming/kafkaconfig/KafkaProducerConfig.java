@@ -1,6 +1,7 @@
 package com.dibya.programming.kafkaconfig;
 
 import com.dibya.programming.dtos.TrafficSignalResponseDto;
+import com.dibya.programming.dtos.TrafficSignalStatusEvent;
 import lombok.Getter;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -43,12 +44,12 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, TrafficSignalResponseDto> producerFactory() {
+    public ProducerFactory<String, TrafficSignalStatusEvent> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<String, TrafficSignalResponseDto> kafkaTemplate() {
+    public KafkaTemplate<String, TrafficSignalStatusEvent> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
