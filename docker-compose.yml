@@ -1,5 +1,6 @@
 version: "3.8"
 services:
+  # User Service MySQL
   mysql:
     image: mysql:8.0
     container_name: smartcity-mysql
@@ -14,6 +15,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
+  # Vehicle Service MySQL
   mysql-vehicles:
     image: mysql:8.0
     container_name: smartcity-mysql-vehicles
@@ -28,6 +30,22 @@ services:
     volumes:
       - mysql-vehicles-data:/var/lib/mysql
 
+  # Traffic Signal Service MySQL
+  mysql-traffic:
+    image: mysql:8.0
+    container_name: smartcity-mysql-traffic
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: roottraffic
+      MYSQL_DATABASE: traffic_signal_db
+      MYSQL_USER: trafficuser
+      MYSQL_PASSWORD: trafficpassword
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-traffic-data:/var/lib/mysql
+
 volumes:
   mysql-data:
   mysql-vehicles-data:
+  mysql-traffic-data:

@@ -91,7 +91,7 @@ public class VehicleController {
        return new ResponseEntity<>("Deleted Successfully",HttpStatus.OK);
    }
     @GetMapping("/details/{registrationNumber}")
-    public ResponseEntity<VehicleResponseDto> getVehicleDetails(@PathVariable("registrationNumber") String registrationNumber,
+    public ResponseEntity<VehicleResponseDto> getVehicleDetails(@PathVariable("registrationNumber,") String registrationNumber,
                                                                 @RequestHeader("X-User-Role") String role,
                                                                 @RequestHeader("X-User-Id") Long currentUserId) {
         VehicleResponseDto vehicleResponse = vehicleServiceImpl.getVehicleByRegistrationNumber(registrationNumber);
