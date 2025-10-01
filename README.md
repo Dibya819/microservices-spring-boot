@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🚦 Smart Traffic Management System
 
 ![Java](https://img.shields.io/badge/Java-17-red?logo=openjdk)
@@ -123,4 +124,6 @@ http://localhost:8080/swagger-ui.html
 **Dibya Bikash Pradhan**  
 - GitHub: [Dibya819](https://github.com/Dibya819)  
 - LinkedIn: [LinkedIn](https://www.linkedin.com/in/dibya-bikash-pradhan)
+=======
+>>>>>>> d75a2bf93e0b6c1fbe9a59b3b620a5f7956917ed
 
