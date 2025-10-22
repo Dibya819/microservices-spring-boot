@@ -3,13 +3,15 @@ package com.dibya.programming.controller;
 import com.dibya.programming.dtos.UpdateVehicleDTO;
 import com.dibya.programming.dtos.VehicleRequestDto;
 import com.dibya.programming.dtos.VehicleResponseDto;
+import com.dibya.programming.globalexceptionhandling.AccessDeniedException;
+import com.dibya.programming.globalexceptionhandling.IllegalArgumentException;
+import com.dibya.programming.globalexceptionhandling.UserNotFoundException;
 import com.dibya.programming.service.VehicleService;
 import com.dibya.programming.service.VehicleServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +36,7 @@ public class VehicleController {
         }
         Long ownerId = vehicleServiceImpl.getUserId(requestDto.getEmail(), requestDto.getPhoneNumber()).join();
         if (ownerId == null) {
-            throw new RuntimeException("User not found with given email or phone number");
+            throw new UserNotFoundException("User not found with given email or phone number");
         }
         VehicleResponseDto responseDto= vehicleService.createVehicle(requestDto,ownerId);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
@@ -52,7 +54,7 @@ public class VehicleController {
         if (updateDto.getEmail() != null || updateDto.getPhoneNumber() != null) {
             newOwnerId = vehicleServiceImpl.getUserId(updateDto.getEmail(), updateDto.getPhoneNumber()).join();
             if (newOwnerId == null) {
-                throw new RuntimeException("User not found with given email or phone number");
+                throw new UserNotFoundException("User not found with given email or phone number");
             }
         }
         VehicleResponseDto response = vehicleService.updateVehicle(id, updateDto,newOwnerId);
@@ -63,17 +65,36 @@ public class VehicleController {
                                                                 @RequestParam(name = "phoneNumber",required = false)String number,
                                                                 @RequestHeader("X-User-Role")String role,
                                                                 @RequestHeader("X-User-Id") Long currentUserId){
-        Long userId;
-        if("ADMIN".equals(role) || "TRAFFIC_OFFICER".equals(role)){
-             userId=vehicleServiceImpl.getUserId(email,number).join();
-            if (userId == null) {
-                throw new RuntimeException("User not found with given email/phone");
-            }
-        }else {
-              userId=currentUserId;
-        }
-        List<VehicleResponseDto> vehicleResponse=vehicleServiceImpl.getVehiclesByOwner(userId);
-        return new ResponseEntity<>(vehicleResponse,HttpStatus.OK);
+       Long userId;
+
+       if ("ADMIN".equals(role) || "TRAFFIC_OFFICER".equals(role)) {
+           if (email == null && number == null) {
+               throw new IllegalArgumentException("Please provide email or phone number to fetch user vehicles");
+           }
+           userId = vehicleServiceImpl.getUserId(email, number).join();
+           if (userId == null) {
+               throw new UserNotFoundException("User not found with given email/phone");
+           }
+
+       } else if ("DRIVER".equals(role)) {
+           if (email != null || number != null) {
+               userId = vehicleServiceImpl.getUserId(email, number).join();
+               if (userId == null) {
+                   throw new UserNotFoundException("User not found with given email/phone");
+               }
+               if (!userId.equals(currentUserId)) {
+                   throw new AccessDeniedException("Access denied: You can only view your own vehicles");
+               }
+           } else {
+               userId = currentUserId;
+           }
+
+       } else {
+           throw new AccessDeniedException("Unauthorized role");
+       }
+
+       List<VehicleResponseDto> vehicleResponse = vehicleServiceImpl.getVehiclesByOwner(userId);
+       return ResponseEntity.ok(vehicleResponse);
    }
    @DeleteMapping("/{vehicleId}")
    public ResponseEntity<String> deleteVehicle(@PathVariable("vehicleId") Long vehicleId,
@@ -85,16 +106,17 @@ public class VehicleController {
         }
         Long ownerId=vehicleServiceImpl.getUserId(email,number).join();
        if (ownerId == null) {
-           throw new RuntimeException("User not found with given email/phone");
+           throw new UserNotFoundException("User not found with given email/phone");
        }
        vehicleService.deleteVehicleOfUser(vehicleId,ownerId);
        return new ResponseEntity<>("Deleted Successfully",HttpStatus.OK);
    }
     @GetMapping("/details/{registrationNumber}")
-    public ResponseEntity<VehicleResponseDto> getVehicleDetails(@PathVariable("registrationNumber,") String registrationNumber,
+    public ResponseEntity<VehicleResponseDto> getVehicleDetails(@PathVariable("registrationNumber") String registrationNumber,
                                                                 @RequestHeader("X-User-Role") String role,
                                                                 @RequestHeader("X-User-Id") Long currentUserId) {
         VehicleResponseDto vehicleResponse = vehicleServiceImpl.getVehicleByRegistrationNumber(registrationNumber);
+
         if ("DRIVER".equals(role) && !vehicleResponse.getOwnerId().equals(currentUserId)) {
             throw new AccessDeniedException("You are not allowed to view this vehicle");
         }

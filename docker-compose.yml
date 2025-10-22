@@ -45,6 +45,22 @@ services:
     volumes:
       - mysql-traffic-data:/var/lib/mysql
 
+
+  mysql-violation:
+    image: mysql:8.0
+    container_name: smartcity-mysql-violation
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: violationpassword
+      MYSQL_DATABASE: violation_db
+      MYSQL_USER: violationuser
+      MYSQL_PASSWORD: violationpassword
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql-violation-data:/var/lib/mysql
+
+
   zookeeper:
       image: wurstmeister/zookeeper
       ports:
@@ -66,3 +82,4 @@ volumes:
   mysql-data:
   mysql-vehicles-data:
   mysql-traffic-data:
+  mysql-violation-data:
