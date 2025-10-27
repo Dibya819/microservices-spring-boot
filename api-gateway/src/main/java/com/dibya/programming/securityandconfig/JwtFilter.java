@@ -1,6 +1,7 @@
 package com.dibya.programming.securityandconfig;
 
 import io.jsonwebtoken.Claims;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -28,7 +29,7 @@ public class JwtFilter implements WebFilter {
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange,WebFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
         if (path.startsWith("/auth")) {

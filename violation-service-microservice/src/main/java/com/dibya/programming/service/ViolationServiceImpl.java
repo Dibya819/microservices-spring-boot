@@ -78,10 +78,10 @@ public class ViolationServiceImpl implements ViolationService{
             }
 
             VehicleInfo vehicleInfo = vehicleInfoRepository.findVehicleByVehicleId(vehicleInfoDTO.getId())
-                    .orElse(mapVehicleDtoToEntity(vehicleInfoDTO));
+                    .orElseGet(() -> vehicleInfoRepository.save(mapVehicleDtoToEntity(vehicleInfoDTO)));
 
             UserInfo userInfo = userInfoRepository.findUserByUserId(userDTO.getId())
-                    .orElse(mapUserDtoToEntity(userDTO));
+                    .orElseGet(() -> userInfoRepository.save(mapUserDtoToEntity(userDTO)));
 
             userInfo.setTotalFine(userInfo.getTotalFine() + requestDTO.getFineAmount());
             userInfoRepository.save(userInfo);
@@ -205,6 +205,21 @@ public class ViolationServiceImpl implements ViolationService{
         userInfoRepository.save(user);
 
         repository.delete(violation);
+    }
+
+    public double getTotalFineForUser(Long userId) {
+        return userInfoRepository.findUserByUserId(userId)
+                .map(UserInfo::getTotalFine)
+                .orElse(0.0);
+    }
+
+    @Transactional
+    public void clearUserFines(Long userId) {
+        UserInfo user = userInfoRepository.findUserByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setTotalFine(0.0);
+        userInfoRepository.save(user);
     }
 
 

@@ -46,8 +46,8 @@ public class ViolationController {
             @RequestParam(name="phoneNumber",required = false) String phoneNumber,
             @RequestParam(name="vehicleNumber",required = false)String vehicleNumber) {
 
-        if ((email == null || email.isBlank()) && (phoneNumber == null || phoneNumber.isBlank())) {
-            throw new IllegalArgumentException("Either Email or Phone Number must be provided!!");
+        if ((email == null || email.isBlank()) && (phoneNumber == null || phoneNumber.isBlank()) && (vehicleNumber==null || vehicleNumber.isBlank())) {
+            throw new IllegalArgumentException("Either Email,Phone or vehicle Number must be provided!!");
         }
 
         if (!"DRIVER".equals(role) && !"TRAFFIC_OFFICER".equals(role) && !"ADMIN".equals(role)) {
@@ -103,5 +103,18 @@ public class ViolationController {
         return new ResponseEntity<>("Violation deleted successfully", HttpStatus.OK);
     }
 
-
+    @GetMapping("/total-fine")
+    public ResponseEntity<Double> getTotalFine(@RequestHeader("X-User-Id") Long userId) {
+        double totalFine = violationService.getTotalFineForUser(userId);
+        return ResponseEntity.ok(totalFine);
     }
+
+    @PostMapping("/clear-fines")
+    public ResponseEntity<String> clearFines(@RequestHeader("X-User-Id") Long userId) {
+        violationService.clearUserFines(userId);
+        return ResponseEntity.ok("All fines cleared successfully.");
+    }
+
+
+
+}

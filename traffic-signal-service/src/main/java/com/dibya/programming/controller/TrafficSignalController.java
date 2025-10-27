@@ -37,9 +37,9 @@ public class TrafficSignalController {
     }
 
     @GetMapping("/traffic-signals")
-    public ResponseEntity<List<TrafficSignalResponseDto>> getSignals(  @RequestParam(name = "city", required = false) String city,
-                                                                 @RequestParam(name = "area", required = false) String area,
-                                                                 @RequestHeader("X-User-Role") String role){
+    public ResponseEntity<List<TrafficSignalResponseDto>> getSignals(@RequestParam(name = "city", required = false) String city,
+                                                                     @RequestParam(name = "area", required = false) String area,
+                                                                     @RequestHeader("X-User-Role") String role){
         if (!"ADMIN".equals(role) && !"TRAFFIC_OFFICER".equals(role)) {
             throw new AccessDeniedException("You are not allowed to view traffic signals");
         }

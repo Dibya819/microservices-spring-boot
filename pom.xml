@@ -15,6 +15,7 @@
         <module>vehicle-registration-service</module>
         <module>traffic-signal-service</module>
         <module>violation-service-microservice</module>
+        <module>payment-service-microservice</module>
     </modules>
 
 

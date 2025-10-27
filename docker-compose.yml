@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  # User Service MySQL
+
   mysql:
     image: mysql:8.0
     container_name: smartcity-mysql
@@ -15,7 +15,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
-  # Vehicle Service MySQL
+
   mysql-vehicles:
     image: mysql:8.0
     container_name: smartcity-mysql-vehicles
@@ -30,7 +30,7 @@ services:
     volumes:
       - mysql-vehicles-data:/var/lib/mysql
 
-  # Traffic Signal Service MySQL
+
   mysql-traffic:
     image: mysql:8.0
     container_name: smartcity-mysql-traffic
@@ -60,6 +60,20 @@ services:
     volumes:
       - mysql-violation-data:/var/lib/mysql
 
+  mysql-payment:
+    image: mysql:8.0
+    container_name: smartcity-mysql-payment
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: paymentpassword
+      MYSQL_DATABASE: payment_db
+      MYSQL_USER: paymentuser
+      MYSQL_PASSWORD: paymentpassword
+    ports:
+      - "3310:3306"
+    volumes:
+      - mysql-payment-data:/var/lib/mysql
+
 
   zookeeper:
       image: wurstmeister/zookeeper
@@ -83,3 +97,4 @@ volumes:
   mysql-vehicles-data:
   mysql-traffic-data:
   mysql-violation-data:
+  mysql-payment-data:
