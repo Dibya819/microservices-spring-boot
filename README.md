@@ -6,69 +6,64 @@
 ![Microservices](https://img.shields.io/badge/Architecture-Microservices-orange)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-A **microservices-based traffic management system** built using **Spring Boot, Spring Cloud, Kafka, RabbitMQ, JWT, and Resilience4j**.  
-It manages **users, vehicles, traffic signals, violations, notifications, and analytics** for smarter, safer cities.
+A **microservices-based Smart Traffic Management System** built with **Spring Boot, Spring Cloud, Kafka, RabbitMQ, JWT, Razorpay, and Resilience4j**.  
+It manages **users, vehicles, traffic signals, violations, notifications, analytics, and online payments** for smarter, safer cities.
 
 ---
 
 ## 📌 Microservices Overview
 
 | Service | Responsibilities |
-|---------|-----------------|
-| **User Service** | Manage drivers, traffic officers, admins; JWT auth, CRUD, validation |
-| **Vehicle Service** | Vehicle registration, owner info, REST API |
-| **Traffic Signal Service** | Track signals (red/yellow/green); periodic updates; async messaging |
-| **Violation Service** | Record traffic violations; fetch user/vehicle info; Resilience4j fault tolerance |
-| **Notification Service** | Send notifications via Email/SMS; async events (Kafka/RabbitMQ) |
-| **Analytics & Prediction Service** | Traffic congestion prediction; pollution monitoring |
-| **Gateway Service** | API routing, JWT validation, load balancing |
-| **Eureka Service** | Service discovery for all microservices |
-| **Config Service (optional)** | Centralized configuration for all services |
+|----------|------------------|
+| 🧍 **User Service** | Manage drivers, officers, admins; authentication using JWT; CRUD and validation |
+| 🚗 **Vehicle Service** | Handle vehicle registration and ownership information via REST APIs |
+| 🚦 **Traffic Signal Service** | Track traffic signals (Red/Yellow/Green); periodic updates; async communication (Kafka/RabbitMQ) |
+| ⚠️ **Violation Service** | Record traffic violations; fetch vehicle/user data; uses Resilience4j for fault tolerance |
+| 💳 **Payment Service** | Integrates **Razorpay API** for fine payments and transaction management |
+| 📢 **Notification Service** | Send alerts and notifications (Email/SMS) via event-driven messaging |
+| 📊 **Analytics & Prediction Service** | Analyze traffic data, predict congestion, and monitor pollution |
+| 🌐 **Gateway Service** | API Gateway for routing, JWT validation, and load balancing |
+| 🔍 **Eureka Service** | Service discovery and registration for all microservices |
+| ⚙️ **Config Service (Optional)** | Centralized configuration management for all services |
 
 ---
 
 ## 🏗️ Tech Stack
 
-| Category       | Technologies |
-|----------------|-------------|
-| Language       | Java 17 |
-| Framework      | Spring Boot, Spring Cloud |
-| Messaging      | Kafka, RabbitMQ |
-| Security       | Spring Security, JWT |
-| Resilience     | Resilience4j (Circuit Breaker, Retry, Rate Limiter) |
-| Databases      | MySQL / PostgreSQL |
-| Deployment     | Docker, Kubernetes (future), AWS (future) |
-| Documentation  | Swagger UI |
+| Category | Technologies |
+|-----------|--------------|
+| **Language** | Java 17 |
+| **Frameworks** | Spring Boot, Spring Cloud |
+| **Messaging** | Apache Kafka, RabbitMQ |
+| **Security** | Spring Security, JWT |
+| **Resilience** | Resilience4j (Circuit Breaker, Retry, Rate Limiter) |
+| **Payment Gateway** | Razorpay Integration |
+| **Databases** | MySQL / PostgreSQL |
+| **Containerization** | Docker, Docker Compose |
+| **Future Deployment** | Kubernetes, AWS (ECS, EKS, EC2, S3) |
+| **API Docs** | Swagger UI / OpenAPI 3.0 |
 
 ---
 
 ## 📂 Project Structure
 
 microservices-spring-boot/
-├── user-service
-├── vehicle-service
-├── traffic-signal-service
-├── violation-service
-├── notification-service
-├── analytics-service
-├── gateway-service
-├── eureka-service
-└── config-service
+├── user-service/
+├── vehicle-service/
+├── traffic-signal-service/
+├── violation-service/
+├── notification-service/
+├── payment-service/
+├── analytics-service/
+├── gateway-service/
+├── eureka-service/
+└── config-service/
 
-yaml
-Copy code
 
----
 
-## 🚀 How to Run Locally
+2️⃣ Start services in order
 
-1. Clone the repo:
-```bash
-git clone https://github.com/Dibya819/microservices-spring-boot.git
-cd microservices-spring-boot
-Start Eureka Service first.
-
-Start each microservice in this order:
+Eureka Service
 
 User Service
 
@@ -80,48 +75,81 @@ Violation Service
 
 Notification Service
 
+Payment Service
+
 Analytics Service
 
 Gateway Service
 
-Access APIs via Gateway:
+3️⃣ Access the system
 
-arduino
-Copy code
+Gateway base URL:
 http://localhost:8080
-Open Swagger UI:
 
-bash
-Copy code
+Swagger UI:
 http://localhost:8080/swagger-ui.html
-🔄 System Communication Flow (Coming Soon)
-📌 System flow diagram showing sync and async communication will be added here.
+
+🔄 Communication Flow (Coming Soon)
+
+A detailed architecture diagram showing synchronous REST and asynchronous Kafka/RabbitMQ communication between microservices will be added soon.
 
 📸 Screenshots (Coming Soon)
-📌 Screenshots of Swagger UI, Eureka Dashboard, and Kafka events will be added here.
 
-📅 Roadmap / Future Enhancements
- User Service (JWT Auth, CRUD)
+Swagger UI endpoints
 
- Vehicle Service
+Eureka Service Dashboard
 
- Traffic Signal Service with Kafka
+Kafka and RabbitMQ event logs
 
- Violation Service with Resilience4j
+Razorpay payment workflow
 
- Notification Service with email/SMS
+🧭 Roadmap / Future Enhancements
 
- Analytics & Prediction Service
+✅ JWT Authentication in User Service
 
- Deploy on AWS with Kubernetes
+✅ REST-based inter-service communication
 
- Real-time dashboard UI
+✅ Razorpay Payment Integration
 
- AI-based traffic prediction
+🔄 Kafka/RabbitMQ Event Messaging
 
- ## 👤 Author
-**Dibya Bikash Pradhan**  
-- GitHub: [Dibya819](https://github.com/Dibya819)  
-- LinkedIn: [LinkedIn](https://www.linkedin.com/in/dibya-bikash-pradhan)
+🔄 Resilience4j Circuit Breakers in Violation Service
 
+🔄 Email/SMS Notifications via Notification Service
 
+🔄 Analytics & Prediction Service using ML models
+
+⏳ Docker + Kubernetes Deployment
+
+⏳ AWS Deployment (ECS, EKS, RDS)
+
+⏳ Real-time dashboard UI
+
+⏳ AI-powered traffic and pollution prediction
+
+🧠 Key Features
+
+Secure JWT Authentication
+
+Microservice Communication via REST + Kafka
+
+Razorpay-based Payment System
+
+Centralized Service Discovery (Eureka)
+
+Fault Tolerance (Resilience4j)
+
+Dockerized Deployment
+
+Scalable & Extensible Architecture
+
+👤 Author
+
+Dibya Bikash Pradhan
+🚀 Java Developer | Spring Boot | Microservices | DevOps Enthusiast
+
+🔗 GitHub: Dibya819
+
+💼 LinkedIn: Dibya Bikash Pradhan
+
+💡 “Smart cities need smart traffic systems — and this project is one step closer to that vision.”
