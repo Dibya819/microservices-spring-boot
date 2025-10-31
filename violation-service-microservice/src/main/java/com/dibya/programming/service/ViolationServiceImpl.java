@@ -5,6 +5,7 @@ import com.dibya.programming.dtos.*;
 import com.dibya.programming.globalexceptionhandling.UserNotFoundException;
 import com.dibya.programming.globalexceptionhandling.VehicleNotFoundException;
 import com.dibya.programming.globalexceptionhandling.ViolationNotFoundException;
+import com.dibya.programming.kafkaConfig.ViolationProducer;
 import com.dibya.programming.model.UserInfo;
 import com.dibya.programming.model.VehicleInfo;
 import com.dibya.programming.model.Violation;
@@ -34,13 +35,15 @@ public class ViolationServiceImpl implements ViolationService{
     private final WebClient webClient;
     private final UserInfoRepository userInfoRepository;
     private final VehicleInfoRepository vehicleInfoRepository;
+    private final ViolationProducer violationProducer;
 
     @Autowired
-    public ViolationServiceImpl(ViolationRepository repository, WebClient.Builder webClient, UserInfoRepository userInfoRepository, VehicleInfoRepository vehicleInfoRepository) {
+    public ViolationServiceImpl(ViolationRepository repository, WebClient.Builder webClient, UserInfoRepository userInfoRepository, VehicleInfoRepository vehicleInfoRepository, ViolationProducer violationProducer) {
         this.repository = repository;
         this.webClient = webClient.build();
         this.userInfoRepository = userInfoRepository;
         this.vehicleInfoRepository = vehicleInfoRepository;
+        this.violationProducer = violationProducer;
     }
 
     @Override
@@ -88,6 +91,20 @@ public class ViolationServiceImpl implements ViolationService{
 
             Violation violation = mapToEntity(requestDTO, vehicleInfo, userInfo);
             Violation savedViolation = repository.save(violation);
+
+            ViolationNotificationEvent event = ViolationNotificationEvent.builder()
+                    .userEmail(userInfo.getEmail())
+                    .userPhone(userInfo.getPhoneNumber())
+                    .userName(userInfo.getName())
+                    .violationType(requestDTO.getViolationType())
+                    .fineAmount(requestDTO.getFineAmount())
+                    .location(requestDTO.getLocation())
+                    .timestamp(LocalDateTime.now())
+                    .vehicleRegistrationNumber(vehicleInfo.getVehicleNumber())
+                    .vehicleType(vehicleInfo.getVehicleType())
+                    .build();
+
+            violationProducer.sendViolationEvent(event);
 
             return mapToDto(savedViolation);
         });

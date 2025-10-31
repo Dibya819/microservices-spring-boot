@@ -16,6 +16,7 @@
         <module>traffic-signal-service</module>
         <module>violation-service-microservice</module>
         <module>payment-service-microservice</module>
+        <module>notification-service-microservice</module>
     </modules>
 
 

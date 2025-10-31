@@ -74,6 +74,20 @@ services:
     volumes:
       - mysql-payment-data:/var/lib/mysql
 
+  mysql-notification:
+    image: mysql:8.0
+    container_name: smartcity-mysql-notification
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: notifpassword
+      MYSQL_DATABASE: notification_db
+      MYSQL_USER: notifUser
+      MYSQL_PASSWORD: notifPassword
+    ports:
+      - "3311:3306"
+    volumes:
+      - mysql-notification-data:/var/lib/mysql
+
 
   zookeeper:
       image: wurstmeister/zookeeper
@@ -98,3 +112,4 @@ volumes:
   mysql-traffic-data:
   mysql-violation-data:
   mysql-payment-data:
+  mysql-notification-data:

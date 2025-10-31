@@ -12,5 +12,6 @@ public class VehicleInfoDTO {
     private String registrationNumber;
     private String type;
     private Long ownerId;
+    private String vehicleModel;
 
 }

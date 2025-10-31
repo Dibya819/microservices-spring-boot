@@ -25,4 +25,6 @@ public class VehicleInfo {
 
     @Column(nullable = false)
     private Long userId;
+
+
 }
